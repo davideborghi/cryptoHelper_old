@@ -5,6 +5,8 @@
  */
 
 package progetto_sas;
+import javax.swing.JFrame;
+import progetto_sas.GUI.*;
 
 /**
  *
@@ -16,7 +18,9 @@ public class Progetto_SAS {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        Login l = new Login();
+        l.setVisible(true);
+        l.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
 }
