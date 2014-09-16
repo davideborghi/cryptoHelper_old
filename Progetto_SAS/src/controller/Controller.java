@@ -20,7 +20,7 @@ import model.Studente;
 public class Controller {
     
     public static DbManager connect(){
-        DbManager db = new DbManager("cryptohelper", "cryptohelper", "cryptohelper");
+        DbManager db = new DbManager("cryptohelper", "root", "root");
         if (!db.connetti()) {
             System.out.println("Errore durante la connessione.");
             System.out.println(db.getErrore());
