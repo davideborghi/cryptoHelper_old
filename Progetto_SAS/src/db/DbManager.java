@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Db;
+package db;
 
 /**
  *
@@ -17,20 +17,20 @@ package Db;
 import java.sql.*;
 import java.util.Vector;
 
-public class DbConnect {
+public class DbManager {
 
-    private String nomeDB; // Nome del Database a cui connettersi
-    private String nomeUtente; // Nome utente utilizzato per la connessione al Database
-    private String pwdUtente; // Password usata per la connessione al Database
+    private String nomeDB = "cryptohelper"; // Nome del Database a cui connettersi
+    private String nomeUtente = "cryptohelper"; // Nome utente utilizzato per la connessione al Database
+    private String pwdUtente = "cryptohelper"; // Password usata per la connessione al Database
     private String errore; // Raccoglie informazioni riguardo l'ultima eccezione sollevata
     private Connection db; // La connessione col Database
     private boolean connesso; // Flag che indica se la connessione è attiva o meno
 
-    public DbConnect(String nomeDB) {
+    public DbManager(String nomeDB) {
         this(nomeDB, "", "");
     }
 
-    public DbConnect(String nomeDB, String nomeUtente, String pwdUtente) {
+    public DbManager(String nomeDB, String nomeUtente, String pwdUtente) {
         this.nomeDB = nomeDB;
         this.nomeUtente = nomeUtente;
         this.pwdUtente = pwdUtente;

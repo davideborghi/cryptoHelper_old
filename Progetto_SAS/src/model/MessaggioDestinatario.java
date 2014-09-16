@@ -4,18 +4,12 @@
  * and open the template in the editor.
  */
 
-package Classes;
+package model;
 
 /**
  *
  * @author MASTER
  */
-public class Studente {
-    private int id;
-    private String username;
-    private String password;
-    private String nome;
-    private String cognome;
-    
-    public Studente(){}
+public interface MessaggioDestinatario {
+    public boolean isLetto();
 }
