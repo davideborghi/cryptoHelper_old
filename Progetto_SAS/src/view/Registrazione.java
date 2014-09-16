@@ -127,8 +127,9 @@ public class Registrazione extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         System.out.println(jTextField1.getText());
+        System.out.println(jTextField2.getText());
         /*mancano controlli sulla password*/
-        new Studente(jTextField1.getText(), jTextField2.getText()).registra();
+        new Studente(jTextField1.getText(), jTextField2.getText(), true).registra();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed

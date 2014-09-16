@@ -10,16 +10,24 @@ import model.Proposta;
 //import Clasmodeldente;
 //import Classemodelnfo;
 import db.DbManager;
+import db.DbManager0;
+import db.Query;
+import db.QueryResult;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
+import model.PropostaConfermata;
 import model.Session;
+import model.SistemaCifratura;
 import model.Studente;
+import model.UserInfo;
 /**
  *
  * @author MASTER
  */
 public class Controller {
     
-    public static DbManager connect(){
+    /*public static DbManager connect(){
         DbManager db = new DbManager("cryptohelper", "root", "root");
         if (!db.connetti()) {
             System.out.println("Errore durante la connessione.");
@@ -27,7 +35,7 @@ public class Controller {
             System.exit(0);
         }
         return db;
-    }
+    }*/
     
     
     
@@ -43,22 +51,37 @@ public class Controller {
     }*/
     
     public static boolean accettaProposta(Proposta p){
-        DbManager db = connect();
-        if (!db.eseguiAggiornamento("UPDATE `cryptohelper`.`proposta` SET `stato` = 'accettata' WHERE `proposta`.`id` = " + p.getId())) {
+        //DbManager db = connect();
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("UPDATE `cryptohelper`.`proposta` SET `stato` = 'accettata' WHERE `proposta`.`id` = " + p.getId());
+            q.executeUpdate();
+        }
+        catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        /*if (!db.eseguiAggiornamento("UPDATE `cryptohelper`.`proposta` SET `stato` = 'accettata' WHERE `proposta`.`id` = " + p.getId())) {
             System.out.println("Errore nell'aggiornamento!");
             System.out.println(db.getErrore());
             return false;
-        }
+        }*/
         return true;
     }
     
     public static boolean rifiutaProposta(Proposta p){
-        DbManager db = connect();
-        if (!db.eseguiAggiornamento("UPDATE `cryptohelper`.`proposta` SET `stato` = 'rifiutata' WHERE `proposta`.`id` = " + p.getId())) {
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("UPDATE `cryptohelper`.`proposta` SET `stato` = 'rifiutata' WHERE `proposta`.`id` = " + p.getId());
+            q.executeUpdate();
+        }
+        catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        /*if (!db.eseguiAggiornamento("UPDATE `cryptohelper`.`proposta` SET `stato` = 'accettata' WHERE `proposta`.`id` = " + p.getId())) {
             System.out.println("Errore nell'aggiornamento!");
             System.out.println(db.getErrore());
             return false;
-        }
+        }*/
         return true;
     }
     
@@ -77,15 +100,20 @@ public class Controller {
     
     
     public static Studente[] recuperaUtenti(){
-        DbManager db = connect();
-        Vector v = db.eseguiQuery("SELECT * FROM user where username <> '" + Session.getLoggedUser() + "'");
-        Studente[] s = new Studente[v.size()];
-        for(int i = 0; i<v.size(); i++){
-            //System.out.println(((String[])v.elementAt(i))[0]);
-            String id = ((String[])v.elementAt(i))[0];
-            //int id = Integer.parseInt(stringa);
-            s[i] = new Studente(id, ((String[])v.elementAt(i))[1]);
+        ArrayList<Studente> result = new ArrayList<>();
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("SELECT * FROM user where username <> '" + Session.getLoggedUser() + "'");
+            QueryResult rs = db.execute( q );
+            while( rs.next() ) {
+                String id = rs.getString(1);
+                String user = rs.getString(2);
+                result.add( new Studente( id, user  ) );
+            }
         }
-        return s;
+        catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        return result.toArray( new Studente[result.size()] );
     }
 }

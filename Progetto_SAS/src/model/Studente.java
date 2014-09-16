@@ -6,8 +6,12 @@
 
 package model;
 
-import static controller.Controller.connect;
+//import static controller.Controller.connect;
 import db.DbManager;
+import db.DbManager0;
+import db.Query;
+import db.QueryResult;
+import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -20,6 +24,7 @@ public class Studente {
     private String id;
     private String login;
     private String pwd;
+    private DbManager0 DbManager0;
     
     public Studente(String user){
         this.login = user;
@@ -44,40 +49,46 @@ public class Studente {
     }
     
     public boolean login(){
-        DbManager db = connect();
+        /*DbManager db = connect();
         System.out.println(login + " " + pwd);
         Vector v = db.eseguiQuery("SELECT * FROM user WHERE username = '"+this.login+"' and password = '"+this.pwd+"';");
         if(v.size() <= 0) return false;
         String s = ((String[])v.elementAt(0))[0];
         this.id = s;
-        return true;
+        return true;*/
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("SELECT * FROM user WHERE username = '"+this.login+"' and password = '"+this.pwd+"';");
+            QueryResult rs = db.execute(q);
+            rs.next();
+            if(rs.wasNull()) return false;
+            this.id = rs.getInt("id")+"";
+            return true;
+        }
+         catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
     }
     
-    public void registra(){
+    public boolean registra(){
         
-        DbManager db = connect();
-        // Eseguo una query sul database. La tabella si chiama Tbl.
-        //Vector v = db.eseguiQuery("SELECT * FROM user;");
-
-        // Stampiamo i risultati:
-        /*int i = 0;
-        while (i < v.size()) {
-            String[] record = (String[]) v.elementAt(i);
-            System.out.println("Record numero " + (i + 1));
-            for (int j = 0; j < record.length; j++) {
-                System.out.println(record[j]);
-            }
-            i++;
-        }*/
-
-        // Eseguo un aggiornamento sul campo 'nomecampo' della tabella Tbl:
+        /*DbManager db = connect();
         if (!db.eseguiAggiornamento("INSERT INTO `cryptohelper`.`user` (`username`, `password`, `nome`, `cognome`) VALUES ('" +this.login+"', '"+this.pwd+"', NULL, NULL);")) {
             System.out.println("Errore nell'aggiornamento!");
             System.out.println(db.getErrore());
         }
 
         // Ora chiudo la connessione col Database:
-        db.disconnetti();
+        db.disconnetti();*/
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("INSERT INTO `cryptohelper`.`user` (`username`, `password`, `nome`, `cognome`) VALUES ('" +this.login+"', '"+this.pwd+"', NULL, NULL);");
+            q.executeUpdate();
+        }
+        catch (SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        return true;
     }
     
     public String getId(){

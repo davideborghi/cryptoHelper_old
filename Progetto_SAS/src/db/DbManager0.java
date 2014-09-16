@@ -57,6 +57,13 @@ public class DbManager0 {
     }
   }
   
+  /*public class QueryResultImpl2 extends QueryResultAbstract {
+
+    public QueryResultImpl2(Query q) throws SQLException {
+      super(q.executeUpdate(), q);
+    }
+  }*/
+  
   private DbManager0() throws SQLException {
     DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
     engine = DriverManager.getConnection("jdbc:mysql://localhost/" + schema, uname, passw);
@@ -68,5 +75,9 @@ public class DbManager0 {
   public QueryResult execute( Query q ) throws SQLException {
     return new QueryResultImpl( q );
   }
+  
+  /*public QueryResult executeUpdate( Query q ) throws SQLException {
+    return new QueryResultImpl( q );
+  }*/
   
 }

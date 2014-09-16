@@ -8,7 +8,12 @@ package model;
 
 import static controller.Controller.*;
 import db.DbManager;
+import db.DbManager0;
+import db.Query;
+import db.QueryResult;
 import java.awt.List;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -88,7 +93,24 @@ public class Messaggio implements MessaggioMittente, MessaggioDestinatario{
     }
     
     public static MessaggioDestinatario[] caricaRicevuti(){
-        DbManager db = connect();
+        ArrayList<MessaggioDestinatario> result = new ArrayList<>();
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("SELECT * FROM `cryptohelper`.`messaggio` WHERE id_destinatario = " + Session.getIdLoggedUser());
+            QueryResult rs = db.execute(q);
+            while( rs.next() ){
+                UserInfo mittente = new UserInfo(rs.getString(2));
+                UserInfo destinatario = new UserInfo(rs.getString(3));
+                String testo = rs.getString(4);
+                String lingua = rs.getString(6);
+                result.add(new Messaggio(testo, lingua, mittente, destinatario));
+            }
+        }
+        catch (SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        return result.toArray( new MessaggioDestinatario[result.size()] );
+        /*DbManager db = connect();
         MessaggioDestinatario[] m;
         Vector v = db.eseguiQuery("SELECT * FROM `cryptohelper`.`messaggio` WHERE id_destinatario = " + Session.getIdLoggedUser());
         if(v.size()<= 0) return new MessaggioDestinatario[0];
@@ -98,7 +120,7 @@ public class Messaggio implements MessaggioMittente, MessaggioDestinatario{
                 m[i] = new Messaggio(((String[])v.elementAt(i))[3], ((String[])v.elementAt(i))[5], new UserInfo(((String[])v.elementAt(i))[1]), new UserInfo(((String[])v.elementAt(i))[2]));
             }
             return m;
-        }
+        }*/
     }
     
     public boolean elimina(){
@@ -120,13 +142,22 @@ public class Messaggio implements MessaggioMittente, MessaggioDestinatario{
     }
     
     public boolean save(){
-        DbManager db = connect();
+        /*DbManager db = connect();
         if (!db.eseguiAggiornamento("INSERT INTO `cryptohelper`.`messaggio` (`id`, `id_mittente`, `id_destinatario`, `testo`, `testoCifrato`, `lingua`, `titolo`, `bozza`, `letto`) VALUES (NULL, '" +this.mittente.getId()+"', '"+this.destinatario.getId()+"', '" + this.testo + "', '" + this.testoCifrato + "' , '" + this.lingua + "', 'titoloDiProva', " + this.bozza + ", false);")) {
             System.out.println("Errore nell'aggiornamento!");
             System.out.println(db.getErrore());
             return false;
         }
         System.out.println("sgsgf");
+        return true;*/
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("INSERT INTO `cryptohelper`.`messaggio` (`id`, `id_mittente`, `id_destinatario`, `testo`, `testoCifrato`, `lingua`, `titolo`, `bozza`, `letto`) VALUES (NULL, '" +this.mittente.getId()+"', '"+this.destinatario.getId()+"', '" + this.testo + "', '" + this.testoCifrato + "' , '" + this.lingua + "', 'titoloDiProva', " + this.bozza + ", false);");
+            q.executeUpdate();
+        }
+        catch (SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
         return true;
     }
     

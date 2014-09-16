@@ -7,8 +7,12 @@
 package model;
 
 import controller.Controller;
-import static controller.Controller.connect;
+//import static controller.Controller.connect;
 import db.DbManager;
+import db.DbManager0;
+import db.Query;
+import db.QueryResult;
+import java.sql.SQLException;
 
 /**
  *
@@ -42,13 +46,22 @@ public class Proposta {
     }
     
     public boolean save(){
-        DbManager db = connect();
+        /*DbManager db = connect();
         if (!db.eseguiAggiornamento("INSERT INTO `cryptohelper`.`proposta` (`id`, `id_mittente`, `id_destinatario`, `idsistemacifratura`, `stato`, `notificata`) VALUES (NULL, '" +this.proponente.getId()+"', '"+this.partner.getId()+"', '" + Integer.parseInt(this.s.getId()) + "', 'in attesa', NULL);")) {
             System.out.println("Errore nell'aggiornamento!");
             System.out.println(db.getErrore());
             return false;
         }
         System.out.println("sgsgf");
+        return true;*/
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("INSERT INTO `cryptohelper`.`proposta` (`id`, `id_mittente`, `id_destinatario`, `idsistemacifratura`, `stato`, `notificata`) VALUES (NULL, '" +this.proponente.getId()+"', '"+this.partner.getId()+"', '" + Integer.parseInt(this.s.getId()) + "', 'in attesa', NULL);");
+            q.executeUpdate();
+        }
+        catch (SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
         return true;
     }
     

@@ -42,9 +42,9 @@ public class CommunicationController extends Controller{
           QueryResult rs = db.execute( q );
 
           while( rs.next() ) {
-            UserInfo ui1 = new UserInfo( rs.getInt(2)+"" );
-            UserInfo ui2 = new UserInfo( rs.getInt(3)+"" );
-            SistemaCifratura sc = SistemaCifratura.load( rs.getInt(4)+"" );
+            UserInfo ui1 = new UserInfo( rs.getString(2) );
+            UserInfo ui2 = new UserInfo( rs.getString(2) );
+            SistemaCifratura sc = SistemaCifratura.load( rs.getString(4) );
 
             result.add( new Proposta( rs.getInt(1), ui1, ui2, sc ) );
           }
@@ -56,7 +56,7 @@ public class CommunicationController extends Controller{
     }
     
     public static PropostaConfermata[] getProposteAccettate(String id_user){ //proposte pendenti
-        DbManager db = connect();
+        /*DbManager db = connect();
         PropostaConfermata[] p;
         Vector v = db.eseguiQuery("SELECT * FROM `cryptohelper`.`proposta` WHERE id_mittente = " + id_user + " && stato = 'accettata'");
         if(v.size()<= 0) return new PropostaConfermata[0];
@@ -66,7 +66,27 @@ public class CommunicationController extends Controller{
                 p[i] = new PropostaConfermata(Integer.parseInt(((String[])v.elementAt(i))[0]), new UserInfo(((String[])v.elementAt(i))[1]), new UserInfo(((String[])v.elementAt(i))[2]), SistemaCifratura.load(((String[])v.elementAt(i))[3]));
             }
             return p;
+        }*/
+        ArrayList<PropostaConfermata> result = new ArrayList<>();
+        
+        try {
+          DbManager0 db = DbManager0.getInstance();
+
+          Query q = db.createQuery("SELECT * FROM `cryptohelper`.`proposta` WHERE id_mittente = " + id_user + " && stato = 'accettata'");
+          QueryResult rs = db.execute( q );
+
+          while( rs.next() ) {
+            UserInfo ui1 = new UserInfo( rs.getString(2) );
+            UserInfo ui2 = new UserInfo( rs.getString(3) );
+            SistemaCifratura sc = SistemaCifratura.load( rs.getString(4) );
+
+            result.add( new PropostaConfermata( rs.getInt(1), ui1, ui2, sc ) );
+          }
+        } catch( SQLException ex ) {
+          throw new RuntimeException( ex.getMessage(), ex );
         }
+        
+        return result.toArray( new PropostaConfermata[result.size()] );
     }
     
     public static boolean inviaDecisione(Proposta p, String decisione){

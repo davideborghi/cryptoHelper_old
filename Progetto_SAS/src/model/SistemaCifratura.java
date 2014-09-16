@@ -6,8 +6,12 @@
 
 package model;
 
-import static controller.Controller.connect;
+//import static controller.Controller.connect;
 import db.DbManager;
+import db.DbManager0;
+import db.Query;
+import db.QueryResult;
+import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -40,9 +44,19 @@ public class SistemaCifratura {
     }*/
     
     public static SistemaCifratura load(String id){
-        DbManager db = connect();
+        /*DbManager db = connect();
         Vector v = db.eseguiQuery("SELECT * FROM `cryptohelper`.`sistemacifratura` WHERE id = '" + id + "'");
-        return new SistemaCifratura(((String[])v.elementAt(0))[0], ((String[])v.elementAt(0))[1], ((String[])v.elementAt(0))[2], new UserInfo(((String[])v.elementAt(0))[3]));
+        return new SistemaCifratura(((String[])v.elementAt(0))[0], ((String[])v.elementAt(0))[1], ((String[])v.elementAt(0))[2], new UserInfo(((String[])v.elementAt(0))[3]));*/
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("SELECT * FROM `cryptohelper`.`sistemacifratura` WHERE id = '" + id + "'");
+            QueryResult rs = db.execute(q);
+            rs.next();
+            return new SistemaCifratura(rs.getString(1), rs.getString(2), rs.getString(3), new UserInfo(rs.getString(4)));
+        }
+         catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
     }
     
     public String getSdc(){
@@ -68,8 +82,20 @@ public class SistemaCifratura {
     public SistemaCifratura(String chiave, String metodo){
         this.chiave = chiave;
         this.metodo = metodo;
-        this.creatore = new UserInfo(Session.getIdLoggedUser());
-        DbManager db = connect();
+        this.creatore = new UserInfo(Session.getIdLoggedUser()); 
+        try{
+            DbManager0 db = DbManager0.getInstance();
+            Query q = db.createQuery("INSERT INTO `cryptohelper`.`sistemacifratura` (`id`, `chiave`, `metodo`, `idcreatore`) VALUES (NULL, '" +chiave+"', '"+metodo+"', '" + Session.getIdLoggedUser() + "')");
+            q.executeUpdate();
+            q = db.createQuery("SELECT * FROM `cryptohelper`.`sistemacifratura` ORDER BY id DESC");
+            QueryResult rs = db.execute(q);
+            rs.next();
+            this.id = rs.getInt(1) + "";
+        }
+         catch(SQLException ex){
+            throw new RuntimeException( ex.getMessage(), ex );
+        }
+        /*DbManager db = connect();
         System.out.println("INSERT INTO `cryptohelper`.`sistemacifratura` (`id`, `chiave`, `metodo`, `idcreatore`) VALUES (NULL, '" +chiave+"', '"+metodo+"', '" + Session.getIdLoggedUser() + "')");
         if (!db.eseguiAggiornamento("INSERT INTO `cryptohelper`.`sistemacifratura` (`id`, `chiave`, `metodo`, `idcreatore`) VALUES (NULL, '" +chiave+"', '"+metodo+"', '" + Session.getIdLoggedUser() + "')")) {
             System.out.println("Errore nell'aggiornamento!");
@@ -77,6 +103,7 @@ public class SistemaCifratura {
         }
         Vector v = db.eseguiQuery("SELECT * FROM `cryptohelper`.`sistemacifratura` ORDER BY id DESC");
         this.id = (((String[])v.elementAt(0))[0]);
+        */
     }
     
     public SistemaCifratura(){
